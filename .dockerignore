@@ -1,0 +1,50 @@
+# Локальные файлы окружения
+.env
+.env.local
+.env.development
+.env.production
+
+# Виртуальные окружения Python
+venv/
+env/
+.venv/
+__pycache__/
+*.pyc
+
+# Логи и базы данных
+logs/
+*.log
+*.sqlite3
+*.db
+
+# Артефакты разработки
+.pytest_cache/
+.coverage
+htmlcov/
+.dockerignore
+Dockerfile
+README.md
+LICENSE
+
+# Node.js (если используется)
+node_modules/
+npm-debug.log
+yarn-error.log
+yarn-debug.log
+
+# IDE и редакторы
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Архивы и временные файлы
+*.tar.gz
+*.zip
+tmp/
+temp/
+
+# Git
+.git
+.gitignore

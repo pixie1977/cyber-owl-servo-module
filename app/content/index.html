@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <title>Cyber Owl SERVO</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #f7f7f7;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="range"], input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .status {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .control-group {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .preset-buttons {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .link-bar {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 1.1em;
+        }
+        .link-bar a {
+            margin: 0 15px;
+            color: #007bff;
+            text-decoration: none;
+        }
+        .link-bar a:hover {
+            text-decoration: underline;
+        }
+        .value-label {
+            text-align: center;
+            font-size: 0.9em;
+            color: #555;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🦾 Cyber Owl SERVO Контроллер</h1>
+
+    <div class="link-bar">
+        <a href="/docs" target="_blank">📖 API Документация (Swagger)</a> |
+        <a href="/redoc" target="_blank">📚 ReDoc</a>
+    </div>
+
+    <!-- Основные слайдеры для управления сервами -->
+    <div class="controls">
+        <div class="control-group">
+            <label for="hv">Голова Верт. (HV): <span id="hvValue">55</span></label>
+            <input type="range" id="hv" min="0" max="100" value="55" oninput="updateValue('hv', this.value)">
+        </div>
+
+        <div class="control-group">
+            <label for="hh">Голова Гориз. (HH): <span id="hhValue">55</span></label>
+            <input type="range" id="hh" min="0" max="100" value="55" oninput="updateValue('hh', this.value)">
+        </div>
+
+        <div class="control-group">
+            <label for="lw">Левое крыло (LW): <span id="lwValue">55</span></label>
+            <input type="range" id="lw" min="0" max="100" value="55" oninput="updateValue('lw', this.value)">
+        </div>
+
+        <div class="control-group">
+            <label for="rw">Правое крыло (RW): <span id="rwValue">55</span></label>
+            <input type="range" id="rw" min="0" max="100" value="55" oninput="updateValue('rw', this.value)">
+        </div>
+    </div>
+
+    <!-- Кнопки предустановленных поз -->
+    <div class="preset-buttons">
+        <button onclick="sendPosition('happy')">😊 Радость</button>
+        <button onclick="sendPosition('sleep')">😴 Сон</button>
+        <button onclick="sendPosition('ready')">✅ Готовность</button>
+        <button onclick="sendPosition('lw_sign')">🔁 Мах левым</button>
+        <button onclick="sendPosition('rw_sign')">🔁 Мах правым</button>
+    </div>
+
+    <!-- Отправка всех позиций -->
+    <div class="form-group" style="text-align: center; margin-top: 20px;">
+        <label for="wait">Задержка после (мс):</label>
+        <input type="number" id="wait" value="0" min="0" style="width: 100px; text-align: center;">
+        <button onclick="sendAllPositions()">Отправить все позиции</button>
+    </div>
+
+    <!-- Статус -->
+    <div id="status" class="status" style="display: none;"></div>
+
+    <script>
+        function updateValue(id, value) {
+            document.getElementById(id + 'Value').textContent = value;
+        }
+
+        function setStatus(message, isError = false) {
+            const statusEl = document.getElementById("status");
+            statusEl.textContent = message;
+            statusEl.className = "status " + (isError ? "error" : "success");
+            statusEl.style.display = "block";
+        }
+
+        async function sendPosition(mode) {
+            try {
+                let response;
+
+                if (mode === 'happy' || mode === 'sleep' || mode === 'ready') {
+                    response = await fetch(`/servo/${mode}`, {
+                        method: "POST"
+                    });
+                } else if (mode === 'lw_sign') {
+                    const count = prompt("Сколько раз махнуть левым крылом?", "3");
+                    if (!count || isNaN(count)) return;
+                    response = await fetch(`/servo/lw_sign?count=${count}`, {
+                        method: "POST"
+                    });
+                } else if (mode === 'rw_sign') {
+                    const count = prompt("Сколько раз махнуть правым крылом?", "3");
+                    if (!count || isNaN(count)) return;
+                    response = await fetch(`/servo/rw_sign?count=${count}`, {
+                        method: "POST"
+                    });
+                }
+
+                if (response.ok) {
+                    const data = await response.json();
+                    setStatus(`✅ Выполнено: ${data.action}`);
+                } else {
+                    const error = await response.json().catch(() => ({ detail: "Неизвестная ошибка" }));
+                    setStatus(`❌ Ошибка: ${error.detail}`, true);
+                }
+            } catch (err) {
+                setStatus(`⚠️ Сеть: ${err.message}`, true);
+            }
+        }
+
+        async function sendAllPositions() {
+            const hv = document.getElementById("hv").value;
+            const hh = document.getElementById("hh").value;
+            const lw = document.getElementById("lw").value;
+            const rw = document.getElementById("rw").value;
+            const wait = document.getElementById("wait").value || 0;
+
+            const payload = {
+                hv: parseInt(hv),
+                hh: parseInt(hh),
+                lw: parseInt(lw),
+                rw: parseInt(rw)
+            };
+
+            if (parseInt(wait) > 0) {
+                payload.wait = parseInt(wait);
+            }
+
+            try {
+                const response = await fetch("/servo/set_positions", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    setStatus(`✅ Позиции обновлены`);
+                } else {
+                    const error = await response.json().catch(() => ({ detail: "Неизвестная ошибка" }));
+                    setStatus(`❌ Ошибка: ${error.detail}`, true);
+                }
+            } catch (err) {
+                setStatus(`⚠️ Сеть: ${err.message}`, true);
+            }
+        }
+    </script>
+</body>
+</html>

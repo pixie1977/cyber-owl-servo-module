@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  tts-server:
+    build: .
+    volumes:
+      - ./models:/app/models:ro
+      - ./app/content:/app/app/content:ro
+      # PulseAudio socket
+      - /run/user/${UID}/pulse:/run/user/${UID}/pulse
+      - /etc/machine-id:/etc/machine-id:ro
+      - /var/lib/dbus/machine-id:/var/lib/dbus/machine-id:ro
+    devices:
+      - /dev/snd:/dev/snd  # Доступ к звуковой карте
+    env_file:
+      - .env
+    ipc: host
+    security_opt:
+      - label:disable
+    ports:
+      - "${TTS_PORT}:${TTS_PORT}"
+    restart: unless-stopped
