@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-echo "🚀 Запуск Cyber Owl TTS сервера..."
+echo "🚀 Запуск Cyber Owl Servo сервера..."
 
 # Проверка и активация виртуального окружения
 VENV_DIR="./venv"
@@ -26,25 +26,16 @@ else
     echo "✅ Зависимости уже установлены."
 fi
 
-# Проверка модели
-MODEL_PATH="./app/models/silero_model_ru.pt"
-if [ ! -f "$MODEL_PATH" ]; then
-    echo "❌ Ошибка: модель не найдена по пути $MODEL_PATH"
-    echo "👉 Скачайте silero_model_ru.pt и поместите в папку app/models/"
+# Проверка директории content
+CONTENT_DIR="./app/content"
+if [ ! -d "$CONTENT_DIR" ]; then
+    echo "❌ Ошибка: директория контента не найдена по пути $CONTENT_DIR"
+    echo "👉 Убедитесь, что директория app/content существует и содержит index.html"
     exit 1
 fi
-echo "✅ Модель найдена: $MODEL_PATH"
 
 echo "📦 Версия Python: $(python --version 2>&1)"
-echo "🌍 API будет доступен на http://$TTS_HOST:$TTS_PORT"
-
-# Проверка PulseAudio (опционально)
-if command -v pactl &> /dev/null; then
-    echo "🔊 PulseAudio: доступен"
-    pactl info | grep 'Server Name\|Library'
-else
-    echo "🔊 PulseAudio: не установлен (работает без аудио-переадресации)"
-fi
+echo "🌍 API будет доступен на http://$SERVO_HOST:$SERVO_PORT"
 
 # Запуск приложения
 echo "▶️ Запуск app.main..."
