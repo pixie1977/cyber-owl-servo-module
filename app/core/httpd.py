@@ -11,6 +11,10 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
+# Импортируем роутеры
+from app.core.routers.servo_router import router as servo_router
+from app.core.routers.health_router import router as health_router
+
 from app.config.config import settings
 from app.core.logger import get_logger
 from app.core.low_level_controllers.servo_controller_manager import (
@@ -46,6 +50,10 @@ app = FastAPI(title="SERVO API Server", lifespan=lifespan)
 # Подключаем статические файлы
 print(f"SERVO_DOC_ROOT={settings.SERVO_DOC_ROOT}")
 app.mount("/static", StaticFiles(directory=settings.SERVO_DOC_ROOT), name="static")
+
+# Подключаем роутеры
+app.include_router(servo_router)
+app.include_router(health_router)
 
 
 # Модель для JSON-запроса
