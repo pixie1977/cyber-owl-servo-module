@@ -1,5 +1,5 @@
+# servo_controller.py
 import queue
-import logging
 from threading import Thread, Event
 from time import sleep
 from typing import Optional, Dict, Any, Callable
@@ -45,7 +45,7 @@ class ServoControllerThread(Thread):
         self._on_connection_restored = on_connection_restored
 
         # Статистика подключений
-        self._connection_stats = {
+        self._connection_stats: Dict[str, Any] = {
             "attempts": 0,
             "successes": 0,
             "failures": 0,
@@ -55,12 +55,12 @@ class ServoControllerThread(Thread):
         if self._port is not None:
             self._connect_with_retry()
 
-    def __enter__(self):
+    def __enter__(self) -> "ServoControllerThread":
         """Поддержка контекстного менеджера."""
         self.start()
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
         """Завершение работы при выходе из контекста."""
         self.stop()
 
@@ -87,9 +87,7 @@ class ServoControllerThread(Thread):
                             self.log.error(f"Error in on_connection_restored callback: {e}")
                     return True
                 else:
-                    self.log.warning(
-                        f"Connection attempt {attempt} failed: connect() returned False"
-                    )
+                    self.log.warning(f"Connection attempt {attempt} failed: connect() returned False")
             except Exception as e:
                 self.log.error(f"Connection attempt {attempt} failed with exception: {e}")
 
@@ -148,19 +146,12 @@ class ServoControllerThread(Thread):
         """Цикл обработки команд из очереди."""
         while self.is_running_process and not self._stop_event.is_set():
             try:
-                # Используем get с таймаутом вместо empty() + sleep — более эффективно
-                try:
-                    command: Dict[str, Any] = self._command_queue.get(timeout=0.1)
-                except queue.Empty:
-                    continue
+                command: Dict[str, Any] = self._command_queue.get(timeout=0.01)
+            except queue.Empty:
+                continue
 
-                self._execute_command(command)
-                self._command_queue.task_done()
-
-            except Exception as e:
-                self.log.exception("Unhandled exception in process loop")
-                self.on_quit()
-                break
+            self._execute_command(command)
+            self._command_queue.task_done()
 
     def _execute_command(self, command: Dict[str, Any]) -> None:
         """Выполнение одной команды."""
@@ -180,7 +171,7 @@ class ServoControllerThread(Thread):
             self.log.error(f"Invalid value for command {command_id}: {value_str}")
             return
 
-        # Обработка команд с эксклюзивными условиями
+        # Обработка команд
         if str_command_id == "rw" or command_id == RW:
             self.set_right_wing(val)
         elif str_command_id == "lw" or command_id == LW:
@@ -199,17 +190,15 @@ class ServoControllerThread(Thread):
 
     def _ensure_connection(self) -> bool:
         """
-        Проверяет соединение и пытается восстановить его при необходимости.
+        Проверяет соединение и пытается восстановить его.
 
         :return: True, если соединение активно или восстановлено
         """
         if self._client is not None and getattr(self._client, "connected", False):
             return True
 
-        self.log.warning(
-            "Modbus connection lost or not established. Attempting to reconnect..."
-        )
-        self.on_quit()  # Закрываем старое соединение, если осталось
+        self.log.warning("Modbus connection lost or not established. Attempting to reconnect...")
+        self.on_quit()
         return self._connect_with_retry()
 
     def on_quit(self) -> None:
@@ -225,7 +214,7 @@ class ServoControllerThread(Thread):
 
     def set_head_vertical(self, value: int = 55) -> None:
         """Установка вертикального положения головы (0–100)."""
-        value = max(0, min(100, value))  # Ограничение диапазона
+        value = max(0, min(100, value))
         if self._ensure_connection():
             self._client.write_register(address=HV, value=value)
 
@@ -296,9 +285,7 @@ class ServoControllerThread(Thread):
         commands = []
         for _ in range(count):
             commands.append({"id": LW, "value": 100})
-            commands.append({"id": "wait", "value": 300})
             commands.append({"id": LW, "value": 0})
-            commands.append({"id": "wait", "value": 300})
         for cmd in commands:
             self.add_command(cmd)
 
@@ -308,9 +295,7 @@ class ServoControllerThread(Thread):
         commands = []
         for _ in range(count):
             commands.append({"id": RW, "value": 95})
-            commands.append({"id": "wait", "value": 300})
             commands.append({"id": RW, "value": 0})
-            commands.append({"id": "wait", "value": 300})
         for cmd in commands:
             self.add_command(cmd)
 

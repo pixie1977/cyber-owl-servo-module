@@ -1,17 +1,18 @@
 """
-Запуск FastAPI-сервера для SERVO-модуля.
+Точка входа для запуска Uvicorn сервера.
+Использует строку-импорт для поддержки hot-reload.
 """
 
-from app.core.httpd import app
-from app.config.config import SERVO_HOST, SERVO_PORT, SERVO_LOG_LEVEL
+from app.config.config import settings
 
 
 if __name__ == "__main__":
     import uvicorn
 
     uvicorn.run(
-        app,
-        host=SERVO_HOST,
-        port=SERVO_PORT,
-        log_level=SERVO_LOG_LEVEL,
+        "app.core.httpd:app",
+        host=settings.SERVO_HOST,
+        port=settings.SERVO_PORT,
+        log_level=settings.uvicorn_log_level,
+        reload=True,
     )

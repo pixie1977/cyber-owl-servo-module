@@ -8,32 +8,39 @@ from logging.handlers import RotatingFileHandler
 
 from app.config.config import settings
 
-# Определяем путь к каталогу логов
+
+# Создание директории для логов
 os.makedirs(settings.SERVO_LOGS_DIR, exist_ok=True)
 LOG_FILE_PATH = os.path.join(settings.SERVO_LOGS_DIR, "stt.log")
 
-# Создаём форматтер
+
+# Форматтер логов
 formatter = logging.Formatter(
     fmt="%(asctime)s - %(name)s - %(levelname)s - %(funcName)s:%(lineno)d - %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S"
+    datefmt="%Y-%m-%d %H:%M:%S",
 )
 
-# Создаём ротационный хендлер (до 5 файлов по 10 МБ)
-handler = RotatingFileHandler(LOG_FILE_PATH, maxBytes=10 * 1024 * 1024, backupCount=5)
-handler.setFormatter(formatter)
 
-# Настраиваем корневой логгер
-logger = logging.getLogger("MBB_logger")
-logger.setLevel(settings.get_log_level())
-logger.addHandler(handler)
+# Обработчик записи в файл с ротацией
+file_handler = RotatingFileHandler(
+    LOG_FILE_PATH,
+    maxBytes=10 * 1024 * 1024,  # 10 МБ
+    backupCount=5,
+)
+file_handler.setFormatter(formatter)
 
-# Добавляем вывод в консоль
+
+# Обработчик вывода в консоль
 console_handler = logging.StreamHandler()
 console_handler.setFormatter(formatter)
-logger.addHandler(console_handler)
 
-# Отключаем передачу логов выше (избегаем дублирования)
-logger.propagate = False
+
+# Настройка корневого логгера
+logger = logging.getLogger("MBB_logger")
+logger.setLevel(settings.SERVO_LOG_LEVEL)
+logger.addHandler(file_handler)
+logger.addHandler(console_handler)
+logger.propagate = False  # Отключение передачи логов выше по иерархии
 
 
 def get_logger(name: str) -> logging.Logger:
