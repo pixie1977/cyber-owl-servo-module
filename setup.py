@@ -7,7 +7,7 @@ from setuptools import find_packages, setup
 
 
 # Чтение README.md
-with open("./README.md", encoding="utf-8") as f:
+with open("README.MD", encoding="utf-8") as f:
     long_description = f.read()
 
 
