@@ -13,3 +13,4 @@ python-Levenshtein
 python-multipart
 scipy
 pymodbus==3.8.0
+pyserial

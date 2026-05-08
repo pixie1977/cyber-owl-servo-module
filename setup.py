@@ -41,6 +41,7 @@ setup(
         "python-multipart",
         "scipy",
         "pymodbus==3.8.0",
+        "pyserial"
     ],
     entry_points={
         "console_scripts": [
