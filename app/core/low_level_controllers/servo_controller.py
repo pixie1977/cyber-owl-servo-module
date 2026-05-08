@@ -249,7 +249,7 @@ class ServoControllerThread(Thread):
         commands = [
             {"id": HH, "value": 55},
             {"id": HV, "value": 0},
-            {"id": LW, "value": 0},
+            {"id": LW, "value": 100},
             {"id": RW, "value": 0},
         ]
         for cmd in commands:
@@ -261,7 +261,7 @@ class ServoControllerThread(Thread):
         commands = [
             {"id": HH, "value": 55},
             {"id": HV, "value": 30},
-            {"id": LW, "value": 100},
+            {"id": LW, "value": 0},
             {"id": RW, "value": 95},
         ]
         for cmd in commands:
