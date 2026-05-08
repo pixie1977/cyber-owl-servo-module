@@ -75,7 +75,7 @@ class ServoControllerThread(Thread):
                     f"Connecting to Modbus device on port {self._port} "
                     f"(attempt {attempt}/{self._reconnect_attempts})"
                 )
-                self._client = ModbusSerialClient(port=self._port, timeout=1.5)
+                self._client = ModbusSerialClient(port=self._port, timeout=0.1)
                 if self._client.connect():
                     self.log.info(f"Successfully connected to Modbus device on port {self._port}")
                     self._connection_stats["successes"] += 1
