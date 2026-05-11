@@ -1,4 +1,7 @@
 #!/bin/bash
+
+cd /home/jet/cyber-owl-servo-module
+
 set -e
 
 echo "🚀 Запуск Cyber Owl Servo сервера..."
