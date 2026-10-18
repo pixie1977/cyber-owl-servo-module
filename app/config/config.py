@@ -46,8 +46,8 @@ class Settings:
             "SERVO_DOC_ROOT",
             default=BASE_DIR / "content",
         )
-        self.SERVO_MODBUS_PORT: str = self._get_str(
-            "SERVO_MODBUS_PORT",
+        self.SERVO_SERIAL_PORT: str = self._get_str(
+            "SERVO_SERIAL_PORT",
             default="/dev/ttyUSB0",
         )
         self.SERVO_LOGS_DIR: Optional[Path] = self._get_path(
@@ -140,7 +140,7 @@ class Settings:
         logger.info(f"  SERVO_PORT: {self.SERVO_PORT}")
         logger.info(f"  SERVO_LOG_LEVEL: {self.SERVO_LOG_LEVEL}")
         logger.info(f"  SERVO_DOC_ROOT: {self.SERVO_DOC_ROOT}")
-        logger.info(f"  SERVO_MODBUS_PORT: {self.SERVO_MODBUS_PORT}")
+        logger.info(f"  SERVO_SERIAL_PORT: {self.SERVO_SERIAL_PORT}")
         logger.info(f"  SERVO_LOGS_DIR: {self.SERVO_LOGS_DIR or 'не задана'}")
 
 

@@ -15,7 +15,7 @@ LW = 2  # Left Wing
 RW = 4  # Right Wing
 
 
-class ServoControllerThread(Thread):
+class ModbusServoControllerThread(Thread):
     """Контроллер сервоприводов через Modbus в отдельном потоке."""
 
     log = get_logger(__name__)
@@ -55,7 +55,7 @@ class ServoControllerThread(Thread):
         if self._port is not None:
             self._connect_with_retry()
 
-    def __enter__(self) -> "ServoControllerThread":
+    def __enter__(self) -> "ModbusServoControllerThread":
         """Поддержка контекстного менеджера."""
         self.start()
         return self

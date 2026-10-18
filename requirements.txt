@@ -14,3 +14,8 @@ python-multipart
 scipy
 pymodbus==3.8.0
 pyserial
+
+# I2C (только для платформ с Blinka/Jetson: pip install adafruit-blinka)
+adafruit-blinka
+adafruit-circuitpython-pca9685
+adafruit-circuitpython-motor

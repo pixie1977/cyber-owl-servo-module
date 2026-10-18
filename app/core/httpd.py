@@ -28,7 +28,7 @@ log = get_logger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     log.info("Starting up SERVO server...")
-    init_servo_controller(port=settings.SERVO_MODBUS_PORT)
+    init_servo_controller(port=settings.SERVO_SERIAL_PORT)
     yield
     log.info("Shutting down SERVO server...")
     ctrl = get_servo_controller()
